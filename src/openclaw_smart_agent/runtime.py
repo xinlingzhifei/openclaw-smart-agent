@@ -61,6 +61,25 @@ class SmartAgentRuntime:
     def publish_task(self, task_desc: str, required_skills: list[str], priority: int = 1) -> TaskRecord:
         return self.router.publish_task(task_desc, required_skills, priority)
 
+    def record_heartbeat(
+        self,
+        *,
+        agent_id: str,
+        cpu_percent: float,
+        memory_percent: float,
+        consecutive_errors: int = 0,
+        current_task_id: str | None = None,
+    ) -> RegisteredAgent:
+        self.monitor.record_heartbeat(
+            agent_id,
+            cpu_percent=cpu_percent,
+            memory_percent=memory_percent,
+            consecutive_errors=consecutive_errors,
+            current_task_id=current_task_id,
+        )
+        self.monitor.evaluate()
+        return self.registry.get_agent(agent_id)
+
     @staticmethod
     def serialize_profile(profile: AgentProfile) -> dict:
         return asdict(profile)

@@ -78,3 +78,49 @@ resource_weight: 0.8
     assert body["task"]["assigned_agent_id"]
     assert status_response.status_code == 200
     assert len(status_response.json()["agents"]) == 1
+
+
+def test_heartbeat_api_updates_agent_health_snapshot(tmp_path):
+    template_dir = tmp_path / "templates"
+    template_dir.mkdir()
+    _write_template(
+        template_dir / "python-developer.yaml",
+        """
+role: python-developer
+keywords:
+  - Python开发
+  - python
+skills:
+  - python
+tools:
+  - shell
+system_prompt: You are a Python implementation specialist.
+resource_weight: 0.8
+""".strip(),
+    )
+
+    from openclaw_smart_agent.api import create_app
+    from openclaw_smart_agent.runtime import SmartAgentRuntime
+
+    runtime = SmartAgentRuntime(db_path=tmp_path / "smart-agent.db", template_dir=template_dir)
+    client = TestClient(create_app(runtime))
+    create_response = client.post("/api/v1/agents/create", json={"identity": "Python开发"})
+    agent_id = create_response.json()["agent"]["agent_id"]
+
+    response = client.post(
+        "/api/v1/agents/heartbeat",
+        json={
+            "agent_id": agent_id,
+            "cpu_percent": 22.0,
+            "memory_percent": 31.0,
+            "consecutive_errors": 0,
+            "current_task_id": "task-demo",
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["agent"]["agent_id"] == agent_id
+    assert body["agent"]["last_heartbeat_at"]
+    assert body["agent"]["current_task_id"] == "task-demo"
+    assert body["agent"]["cpu_percent"] == 22.0

@@ -41,6 +41,7 @@ class HealthMonitor:
         cpu_percent: float,
         memory_percent: float,
         consecutive_errors: int = 0,
+        current_task_id: str | None = None,
         received_at: datetime | None = None,
     ) -> HeartbeatSnapshot:
         snapshot = HeartbeatSnapshot(
@@ -57,6 +58,8 @@ class HealthMonitor:
             cpu_percent=cpu_percent,
             memory_percent=memory_percent,
             consecutive_errors=consecutive_errors,
+            current_task_id=current_task_id,
+            last_heartbeat_at=snapshot.received_at.isoformat(),
         )
         return snapshot
 

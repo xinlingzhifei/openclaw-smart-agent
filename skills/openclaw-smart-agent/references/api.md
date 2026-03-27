@@ -29,6 +29,28 @@ Response:
 
 Use this for registry, health, and load inspection.
 
+### `POST /api/v1/agents/heartbeat`
+
+Request:
+
+```json
+{
+  "agent_id": "agent-xxxx",
+  "cpu_percent": 20,
+  "memory_percent": 25,
+  "consecutive_errors": 0,
+  "current_task_id": "task-xxxx"
+}
+```
+
+Response fields:
+
+- `agent.status`
+- `agent.cpu_percent`
+- `agent.memory_percent`
+- `agent.current_task_id`
+- `agent.last_heartbeat_at`
+
 ### `POST /api/v1/tasks/publish`
 
 Request:

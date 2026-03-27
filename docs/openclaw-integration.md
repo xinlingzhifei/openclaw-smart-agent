@@ -1,0 +1,86 @@
+# OpenClaw Integration Guide
+
+This repository is a skill-first OpenClaw integration bundle:
+
+- the Python runtime provides identity expansion, registry state, routing, and health snapshots
+- the OpenClaw plugin exposes those runtime operations as tools
+- the workspace skill teaches the host agent when to call them
+
+## Local development setup
+
+1. Install the repository locally:
+
+```bash
+python -m pip install -e ".[dev]"
+npm --prefix plugin install --no-audit --no-fund
+openclaw-smart-agent init-config --output config/config.yaml
+```
+
+2. Start the runtime:
+
+```bash
+openclaw-smart-agent serve --config config/config.yaml
+```
+
+3. Verify the runtime directly before opening OpenClaw:
+
+```bash
+curl -X POST http://127.0.0.1:8787/api/v1/agents/create \
+  -H "content-type: application/json" \
+  -d '{"identity":"Python开发"}'
+```
+
+Use the returned `agent_id` in the next check:
+
+```bash
+curl -X POST http://127.0.0.1:8787/api/v1/agents/heartbeat \
+  -H "content-type: application/json" \
+  -d '{"agent_id":"agent-xxxx","cpu_percent":20,"memory_percent":25,"consecutive_errors":0}'
+```
+
+Then inspect the snapshot:
+
+```bash
+curl http://127.0.0.1:8787/api/v1/agents/status
+```
+
+Or run the bundled verifier:
+
+```bash
+python scripts/verify_runtime.py
+```
+
+## OpenClaw tool mapping
+
+The plugin exposes these runtime-backed tools:
+
+- `smart_agent_create`
+- `smart_agent_status`
+- `smart_agent_heartbeat`
+- `smart_agent_publish_task`
+
+`smart_agent_heartbeat` is the minimal health input path for this skill. It records load and heartbeat metadata so the status view has real data instead of static defaults.
+
+## Plugin installation paths
+
+### Local development
+
+Use the `plugin/` package as the local extension source according to your OpenClaw installation workflow. This repository keeps the plugin source in one place so it can be packed, linked, or published without changing the runtime.
+
+### Published distribution
+
+For broader distribution, publish the `plugin/` package to your preferred OpenClaw plugin channel, then install it from that channel while keeping the Python runtime and workspace skill from this repository.
+
+## Skill installation
+
+Copy or sync `skills/openclaw-smart-agent/` into your OpenClaw workspace skills directory. The provided `scripts/install.sh` does this automatically for the default workspace path.
+
+## Recommended validation sequence
+
+1. Start the runtime
+2. Create an agent
+3. Send a heartbeat
+4. Publish a task
+5. Query status from OpenClaw or the REST API
+
+If steps 2 to 5 work, the skill-to-plugin-to-runtime chain is functioning.

@@ -20,8 +20,9 @@ The workflow is:
 | Tool | Use |
 | --- | --- |
 | `smart_agent_create` | Turn a short role description into a registered Smart Agent |
-| `smart_agent_publish_task` | Submit a task and let the router pick the best worker |
 | `smart_agent_status` | Inspect current agents, health state, and load snapshot |
+| `smart_agent_heartbeat` | Record heartbeat, load, and current task information for an agent |
+| `smart_agent_publish_task` | Submit a task and let the router pick the best worker |
 
 ## Operating Pattern
 
@@ -34,6 +35,7 @@ Use `smart_agent_create` when the user gives you a role such as:
 - `测试工程师`
 
 Pass the shortest accurate identity string. Let the runtime expand it from templates.
+If the available roles are not enough, extend the repository templates as documented in `docs/template-guide.md`.
 
 ### Publish work
 
@@ -46,6 +48,10 @@ Use `smart_agent_publish_task` when the user gives a task but does not name a wo
 ### Inspect state
 
 Use `smart_agent_status` before retrying, when assignment looks wrong, or when the user asks why a task is blocked.
+
+### Record heartbeat
+
+Use `smart_agent_heartbeat` when an external worker or integration has fresh CPU, memory, error count, or current-task information and you want the skill's status view to reflect real runtime data.
 
 ## Good Requests
 
@@ -62,3 +68,4 @@ Use `smart_agent_status` before retrying, when assignment looks wrong, or when t
 ## References
 
 For endpoint details and payload shapes, read [references/api.md](references/api.md).
+For template authoring, read `docs/template-guide.md` in the repository root.

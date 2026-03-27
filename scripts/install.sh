@@ -28,8 +28,10 @@ Install complete.
 Next steps:
 1. Start the runtime:
    openclaw-smart-agent serve --config "$ROOT_DIR/config/config.yaml"
-2. Publish the plugin package from "$ROOT_DIR/plugin" to npm or ClawHub, then install it in OpenClaw.
-3. Restart your OpenClaw session so the copied workspace skill is loaded.
+2. Verify the runtime locally with create/status/heartbeat calls:
+   See "$ROOT_DIR/docs/openclaw-integration.md"
+3. Install the plugin from "$ROOT_DIR/plugin" using your OpenClaw local extension workflow or publish it to your preferred plugin channel.
+4. Restart your OpenClaw session so the copied workspace skill is loaded.
 
 Override the workspace target with:
   OPENCLAW_WORKSPACE=/path/to/workspace ./scripts/install.sh

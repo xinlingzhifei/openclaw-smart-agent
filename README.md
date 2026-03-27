@@ -5,18 +5,21 @@
 [![License](https://img.shields.io/github/license/xinlingzhifei/openclaw-smart-agent)](https://github.com/xinlingzhifei/openclaw-smart-agent/blob/main/LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
 
-OpenClaw Smart Agent is a GitHub-publishable bundle for single-machine multi-agent orchestration in OpenClaw. It combines:
+OpenClaw Smart Agent is a GitHub-publishable, skill-first bundle for single-machine multi-agent orchestration in OpenClaw. It combines:
 
-- a Python runtime for identity enhancement, registration, routing, monitoring, and recovery
+- a Python runtime support layer for identity enhancement, registration, routing, heartbeat-backed health snapshots, and task recovery
 - an OpenClaw plugin that exposes the runtime as agent tools
 - a workspace skill that teaches the host agent when and how to use those tools
+
+See [OpenClaw integration guide](docs/openclaw-integration.md) for the local setup path, verification flow, and plugin installation options.
+See [template guide](docs/template-guide.md) for adding or modifying identity templates.
 
 ## What v1 includes
 
 - Zero-configuration identity enhancement from YAML templates
 - SQLite-backed agent registry and task persistence
 - Smart scoring router using skills, load, and priority weighting
-- Health monitoring for heartbeat timeout, CPU or memory pressure, and repeated errors
+- Heartbeat-backed health snapshots for timeout, CPU or memory pressure, and repeated errors
 - Recovery flow that requeues work when an agent becomes unhealthy
 - REST API plus CLI for local operation
 
@@ -75,6 +78,9 @@ openclaw-smart-agent serve --config config/config.yaml
 
 The install script copies the workspace skill into `${OPENCLAW_WORKSPACE:-~/.openclaw/workspace}/skills/openclaw-smart-agent`.
 
+For the full skill-to-plugin-to-runtime verification path, including `smart_agent_heartbeat`, see [docs/openclaw-integration.md](docs/openclaw-integration.md).
+You can also run `python scripts/verify_runtime.py` after starting the runtime to exercise the minimal API flow.
+
 ## OpenClaw integration
 
 1. Start the runtime service:
@@ -94,6 +100,7 @@ The plugin talks to the runtime through `http://127.0.0.1:8787` by default. Over
 ## API quick start
 
 - `POST /api/v1/agents/create`
+- `POST /api/v1/agents/heartbeat`
 - `GET /api/v1/agents/status`
 - `POST /api/v1/tasks/publish`
 

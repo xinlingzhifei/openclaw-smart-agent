@@ -89,3 +89,42 @@ def test_monitor_marks_agent_degraded_after_heartbeat_timeout(tmp_path):
 
     assert refreshed is not None
     assert refreshed.status == AgentStatus.DEGRADED
+
+
+def test_monitor_persists_current_task_and_last_heartbeat(tmp_path):
+    from openclaw_smart_agent.monitor import HealthMonitor
+    from openclaw_smart_agent.recovery import RecoveryManager
+    from openclaw_smart_agent.registry import AgentRegistry
+    from openclaw_smart_agent.store import StateStore
+
+    store = StateStore(tmp_path / "smart-agent.db")
+    registry = AgentRegistry(store)
+    recovery = RecoveryManager(registry)
+    monitor = HealthMonitor(registry, recovery)
+
+    agent = registry.register(
+        AgentProfile(
+            identity="Python开发",
+            role="python-developer",
+            skills=["python"],
+            tools=["shell"],
+            system_prompt="Python",
+            resource_weight=0.8,
+        )
+    )
+    registry.update_status(agent.agent_id, AgentStatus.HEALTHY)
+
+    monitor.record_heartbeat(
+        agent.agent_id,
+        cpu_percent=25.0,
+        memory_percent=30.0,
+        consecutive_errors=1,
+        current_task_id="task-live",
+    )
+
+    refreshed = registry.get_agent(agent.agent_id)
+
+    assert refreshed is not None
+    assert refreshed.current_task_id == "task-live"
+    assert refreshed.last_heartbeat_at is not None
+    assert refreshed.cpu_percent == 25.0

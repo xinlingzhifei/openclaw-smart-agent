@@ -29,6 +29,8 @@ class StateStore:
                 cpu_percent REAL NOT NULL,
                 memory_percent REAL NOT NULL,
                 consecutive_errors INTEGER NOT NULL,
+                current_task_id TEXT,
+                last_heartbeat_at TEXT,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
                 UNIQUE(identity, role)
@@ -46,7 +48,18 @@ class StateStore:
             );
             """
         )
+        self._ensure_agent_columns()
         self.connection.commit()
+
+    def _ensure_agent_columns(self) -> None:
+        columns = {
+            row["name"]
+            for row in self.connection.execute("PRAGMA table_info(agents)").fetchall()
+        }
+        if "current_task_id" not in columns:
+            self.connection.execute("ALTER TABLE agents ADD COLUMN current_task_id TEXT")
+        if "last_heartbeat_at" not in columns:
+            self.connection.execute("ALTER TABLE agents ADD COLUMN last_heartbeat_at TEXT")
 
     def get_agent(self, agent_id: str) -> RegisteredAgent | None:
         row = self.connection.execute(
@@ -72,8 +85,9 @@ class StateStore:
             INSERT OR REPLACE INTO agents (
                 agent_id, identity, role, skills, tools, system_prompt,
                 resource_weight, status, running_tasks, cpu_percent,
-                memory_percent, consecutive_errors, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                memory_percent, consecutive_errors, current_task_id,
+                last_heartbeat_at, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 agent.agent_id,
@@ -88,6 +102,8 @@ class StateStore:
                 agent.cpu_percent,
                 agent.memory_percent,
                 agent.consecutive_errors,
+                agent.current_task_id,
+                agent.last_heartbeat_at,
                 agent.created_at,
                 agent.updated_at,
             ),
@@ -141,6 +157,8 @@ class StateStore:
             cpu_percent=row["cpu_percent"],
             memory_percent=row["memory_percent"],
             consecutive_errors=row["consecutive_errors"],
+            current_task_id=row["current_task_id"],
+            last_heartbeat_at=row["last_heartbeat_at"],
             created_at=row["created_at"],
             updated_at=row["updated_at"],
         )

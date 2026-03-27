@@ -61,12 +61,16 @@ class AgentRegistry:
         cpu_percent: float,
         memory_percent: float,
         consecutive_errors: int = 0,
+        current_task_id: str | None = None,
+        last_heartbeat_at: str | None = None,
     ) -> RegisteredAgent:
         agent = self._require_agent(agent_id)
         agent.running_tasks = running_tasks
         agent.cpu_percent = cpu_percent
         agent.memory_percent = memory_percent
         agent.consecutive_errors = consecutive_errors
+        agent.current_task_id = current_task_id
+        agent.last_heartbeat_at = last_heartbeat_at
         agent.updated_at = utc_now()
         self.store.save_agent(agent)
         return agent

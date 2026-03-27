@@ -44,6 +44,8 @@ class RegisteredAgent(AgentProfile):
     cpu_percent: float = 0.0
     memory_percent: float = 0.0
     consecutive_errors: int = 0
+    current_task_id: str | None = None
+    last_heartbeat_at: str | None = None
     created_at: str = field(default_factory=utc_now)
     updated_at: str = field(default_factory=utc_now)
 

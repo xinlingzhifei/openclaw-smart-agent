@@ -24,3 +24,40 @@ def test_ci_workflow_and_readme_badge_exist():
     readme_text = readme_path.read_text(encoding="utf-8")
     assert "actions/workflows/ci.yml/badge.svg?branch=main" in readme_text
     assert "/actions/workflows/ci.yml" in readme_text
+
+
+def test_plugin_exposes_heartbeat_tool():
+    plugin_entry_path = ROOT / "plugin" / "src" / "index.ts"
+    plugin_text = plugin_entry_path.read_text(encoding="utf-8")
+
+    assert "smart_agent_heartbeat" in plugin_text
+    assert "/api/v1/agents/heartbeat" in plugin_text
+
+
+def test_readme_links_integration_and_heartbeat_flow():
+    readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
+    integration_guide_path = ROOT / "docs" / "openclaw-integration.md"
+
+    assert integration_guide_path.exists()
+    assert "docs/openclaw-integration.md" in readme_text
+    assert "smart_agent_heartbeat" in readme_text
+
+
+def test_template_guide_is_referenced_by_readme_and_skill():
+    readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
+    skill_text = (ROOT / "skills" / "openclaw-smart-agent" / "SKILL.md").read_text(encoding="utf-8")
+    template_guide_path = ROOT / "docs" / "template-guide.md"
+
+    assert template_guide_path.exists()
+    assert "docs/template-guide.md" in readme_text
+    assert "template" in skill_text.casefold()
+
+
+def test_runtime_verification_script_is_documented():
+    readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
+    integration_text = (ROOT / "docs" / "openclaw-integration.md").read_text(encoding="utf-8")
+    verification_script_path = ROOT / "scripts" / "verify_runtime.py"
+
+    assert verification_script_path.exists()
+    assert "verify_runtime.py" in readme_text
+    assert "verify_runtime.py" in integration_text

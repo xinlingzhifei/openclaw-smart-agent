@@ -17,6 +17,14 @@ class PublishTaskRequest(BaseModel):
     priority: int = 1
 
 
+class AgentHeartbeatRequest(BaseModel):
+    agent_id: str = Field(min_length=1)
+    cpu_percent: float
+    memory_percent: float
+    consecutive_errors: int = 0
+    current_task_id: str | None = None
+
+
 def create_app(runtime: SmartAgentRuntime | None = None) -> FastAPI:
     app = FastAPI(title="OpenClaw Smart Agent", version="0.1.0")
     active_runtime = runtime or SmartAgentRuntime(
@@ -37,6 +45,17 @@ def create_app(runtime: SmartAgentRuntime | None = None) -> FastAPI:
         return {
             "agents": [active_runtime.serialize_agent(agent) for agent in active_runtime.get_agents_status()]
         }
+
+    @app.post("/api/v1/agents/heartbeat")
+    def record_heartbeat(payload: AgentHeartbeatRequest) -> dict:
+        agent = active_runtime.record_heartbeat(
+            agent_id=payload.agent_id,
+            cpu_percent=payload.cpu_percent,
+            memory_percent=payload.memory_percent,
+            consecutive_errors=payload.consecutive_errors,
+            current_task_id=payload.current_task_id,
+        )
+        return {"agent": active_runtime.serialize_agent(agent)}
 
     @app.post("/api/v1/tasks/publish")
     def publish_task(payload: PublishTaskRequest) -> dict:
