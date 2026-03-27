@@ -1,5 +1,9 @@
 # OpenClaw Smart Agent
 
+[![Release](https://img.shields.io/github/v/release/xinlingzhifei/openclaw-smart-agent?display_name=tag)](https://github.com/xinlingzhifei/openclaw-smart-agent/releases)
+[![License](https://img.shields.io/github/license/xinlingzhifei/openclaw-smart-agent)](https://github.com/xinlingzhifei/openclaw-smart-agent/blob/main/LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
+
 OpenClaw Smart Agent is a GitHub-publishable bundle for single-machine multi-agent orchestration in OpenClaw. It combines:
 
 - a Python runtime for identity enhancement, registration, routing, monitoring, and recovery
@@ -52,7 +56,7 @@ flowchart LR
 Use this when you want the Python runtime and CLI:
 
 ```bash
-python -m pip install "git+https://github.com/<owner>/<repo>.git"
+python -m pip install "git+https://github.com/xinlingzhifei/openclaw-smart-agent.git"
 openclaw-smart-agent init-config --output config/config.yaml
 openclaw-smart-agent serve --config config/config.yaml
 ```
@@ -62,8 +66,8 @@ openclaw-smart-agent serve --config config/config.yaml
 Use this when you also want the workspace skill and plugin package that live in the repository:
 
 ```bash
-git clone https://github.com/<owner>/<repo>.git
-cd <repo>
+git clone https://github.com/xinlingzhifei/openclaw-smart-agent.git
+cd openclaw-smart-agent
 ./scripts/install.sh
 openclaw-smart-agent serve --config config/config.yaml
 ```
