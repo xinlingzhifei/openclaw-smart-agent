@@ -13,6 +13,10 @@ def test_ci_workflow_and_readme_badge_exist():
     workflow_text = workflow_path.read_text(encoding="utf-8")
     assert "push:" in workflow_text
     assert "pull_request:" in workflow_text
+    assert "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true" in workflow_text
+    assert "actions/checkout@v6" in workflow_text
+    assert "actions/setup-python@v6" in workflow_text
+    assert "actions/setup-node@v6" in workflow_text
     assert "python -m pytest tests -q" in workflow_text
     assert "npm ci" in workflow_text
     assert "npm run check" in workflow_text
