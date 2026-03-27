@@ -61,3 +61,18 @@ def test_runtime_verification_script_is_documented():
     assert verification_script_path.exists()
     assert "verify_runtime.py" in readme_text
     assert "verify_runtime.py" in integration_text
+
+
+def test_docs_explain_openclaw_llm_identity_fallback():
+    readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
+    integration_text = (ROOT / "docs" / "openclaw-integration.md").read_text(encoding="utf-8")
+    skill_text = (ROOT / "skills" / "openclaw-smart-agent" / "SKILL.md").read_text(encoding="utf-8")
+    api_text = (ROOT / "skills" / "openclaw-smart-agent" / "references" / "api.md").read_text(encoding="utf-8")
+    config_text = (ROOT / "config" / "config.example.yaml").read_text(encoding="utf-8")
+
+    assert "llm-task" in readme_text
+    assert "openclaw_llm" in readme_text
+    assert "llm-task" in integration_text
+    assert "identity" in skill_text.casefold()
+    assert "fallback_strategy" in config_text
+    assert "openclaw_llm" in api_text

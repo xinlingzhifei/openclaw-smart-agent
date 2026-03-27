@@ -17,6 +17,8 @@ Response fields:
 - `profile`: enhanced role profile from templates
 - `agent`: registered agent record with `agent_id`, `status`, skills, load, and timestamps
 
+When `identity.fallback_strategy` is set to `openclaw_llm`, this endpoint still checks local templates first and only then asks OpenClaw `llm-task` to generate a structured profile.
+
 ### `GET /api/v1/agents/status`
 
 Response:

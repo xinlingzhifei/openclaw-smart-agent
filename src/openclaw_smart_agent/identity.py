@@ -44,7 +44,7 @@ class IdentityEnhancer:
     def enhance(self, identity: str) -> AgentProfile:
         template = self._match_template(identity)
         if template:
-            profile = AgentProfile(
+            return AgentProfile(
                 identity=identity,
                 role=template.role,
                 skills=template.skills,
@@ -52,18 +52,21 @@ class IdentityEnhancer:
                 system_prompt=template.system_prompt,
                 resource_weight=template.resource_weight,
             )
-        else:
-            profile = AgentProfile(
-                identity=identity,
-                role=self.defaults.role,
-                skills=list(self.defaults.skills),
-                tools=list(self.defaults.tools),
-                system_prompt=self.defaults.system_prompt,
-                resource_weight=self.defaults.resource_weight,
-            )
+
+        profile = AgentProfile(
+            identity=identity,
+            role=self.defaults.role,
+            skills=list(self.defaults.skills),
+            tools=list(self.defaults.tools),
+            system_prompt=self.defaults.system_prompt,
+            resource_weight=self.defaults.resource_weight,
+        )
 
         if self.ai_enhancement_enabled and self.llm_enhancer:
-            return self.llm_enhancer(identity, profile)
+            try:
+                return self.llm_enhancer(identity, profile)
+            except Exception:
+                return profile
 
         return profile
 

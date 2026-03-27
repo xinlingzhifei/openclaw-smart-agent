@@ -36,6 +36,7 @@ Use `smart_agent_create` when the user gives you a role such as:
 
 Pass the shortest accurate identity string. Let the runtime expand it from templates.
 If the available roles are not enough, extend the repository templates as documented in `docs/template-guide.md`.
+If no local template matches and the runtime is configured with `identity.fallback_strategy: openclaw_llm`, `smart_agent_create` can ask OpenClaw's own `llm-task` tool to synthesize a profile before registration.
 
 ### Publish work
 

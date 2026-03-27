@@ -1,3 +1,14 @@
+identity:
+  fallback_strategy: "defaults"
+  openclaw_gateway_url: "http://127.0.0.1:18789"
+  gateway_bearer_token: null
+  session_key: "main"
+  thinking: "low"
+  provider: null
+  model: null
+  auth_profile_id: null
+  timeout_ms: 30000
+  max_tokens: 800
 system:
   heartbeat_interval_sec: 5
   max_retry_count: 3

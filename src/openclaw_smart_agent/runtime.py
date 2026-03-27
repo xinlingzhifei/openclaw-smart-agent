@@ -5,6 +5,7 @@ from openclaw_smart_agent.config import RuntimeConfig
 from openclaw_smart_agent.identity import IdentityEnhancer
 from openclaw_smart_agent.models import AgentProfile, AgentStatus, RegisteredAgent, TaskRecord
 from openclaw_smart_agent.monitor import HealthMonitor, MonitorThresholds
+from openclaw_smart_agent.openclaw_llm import OpenClawGatewayLLMEnhancer
 from openclaw_smart_agent.recovery import RecoveryManager
 from openclaw_smart_agent.registry import AgentRegistry
 from openclaw_smart_agent.router import RouterWeights, TaskRouter
@@ -18,11 +19,19 @@ class SmartAgentRuntime:
         db_path: str | Path,
         template_dir: str | Path | None = None,
         config: RuntimeConfig | None = None,
+        llm_enhancer=None,
     ) -> None:
         self.config = config or RuntimeConfig()
         self.template_dir = Path(template_dir) if template_dir else self.default_template_dir()
         self.store = StateStore(db_path)
-        self.identity = IdentityEnhancer(template_dir=self.template_dir)
+        active_llm_enhancer = llm_enhancer
+        if active_llm_enhancer is None and self.config.identity.fallback_strategy == "openclaw_llm":
+            active_llm_enhancer = OpenClawGatewayLLMEnhancer(self.config.identity)
+        self.identity = IdentityEnhancer(
+            template_dir=self.template_dir,
+            ai_enhancement_enabled=active_llm_enhancer is not None,
+            llm_enhancer=active_llm_enhancer,
+        )
         self.registry = AgentRegistry(self.store)
         self.router = TaskRouter(
             self.registry,

@@ -10,6 +10,7 @@ OpenClaw Smart Agent is a GitHub-publishable, skill-first bundle for single-mach
 - a Python runtime support layer for identity enhancement, registration, routing, heartbeat-backed health snapshots, and task recovery
 - an OpenClaw plugin that exposes the runtime as agent tools
 - a workspace skill that teaches the host agent when and how to use those tools
+- an optional OpenClaw `llm-task` fallback that can synthesize a profile when no local identity template matches
 
 See [OpenClaw integration guide](docs/openclaw-integration.md) for the local setup path, verification flow, and plugin installation options.
 See [template guide](docs/template-guide.md) for adding or modifying identity templates.
@@ -17,6 +18,7 @@ See [template guide](docs/template-guide.md) for adding or modifying identity te
 ## What v1 includes
 
 - Zero-configuration identity enhancement from YAML templates
+- Optional `openclaw_llm` fallback for unmatched identities through OpenClaw Gateway `llm-task`
 - SQLite-backed agent registry and task persistence
 - Smart scoring router using skills, load, and priority weighting
 - Heartbeat-backed health snapshots for timeout, CPU or memory pressure, and repeated errors
@@ -97,12 +99,24 @@ openclaw-smart-agent serve --config config/config.yaml
 
 The plugin talks to the runtime through `http://127.0.0.1:8787` by default. Override it with `OPENCLAW_SMART_AGENT_BASE_URL`.
 
+## OpenClaw LLM identity fallback
+
+Template matching stays first. If no YAML template matches, you can optionally ask OpenClaw itself to generate the profile through the official `llm-task` tool.
+
+1. Enable and allowlist `llm-task` in OpenClaw.
+2. Turn on `identity.fallback_strategy: openclaw_llm` in `config/config.yaml`.
+3. Point the runtime at your OpenClaw Gateway URL and bearer token.
+
+See [docs/openclaw-integration.md](docs/openclaw-integration.md) for the required OpenClaw config and an example runtime config block.
+
 ## API quick start
 
 - `POST /api/v1/agents/create`
 - `POST /api/v1/agents/heartbeat`
 - `GET /api/v1/agents/status`
 - `POST /api/v1/tasks/publish`
+
+`POST /api/v1/agents/create` uses local templates first and can fall back to `openclaw_llm` when configured.
 
 Example:
 
