@@ -1,0 +1,14 @@
+system:
+  heartbeat_interval_sec: 5
+  max_retry_count: 3
+router:
+  strategy: "smart_scoring"
+  capability_weight: 0.5
+  load_weight: 0.3
+  priority_weight: 0.2
+monitor:
+  auto_restart_on_crash: true
+  heartbeat_timeout_sec: 15
+  max_cpu_percent: 90
+  max_memory_percent: 90
+  max_consecutive_errors: 3

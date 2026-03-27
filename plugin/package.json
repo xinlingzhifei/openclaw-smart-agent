@@ -1,0 +1,22 @@
+{
+  "name": "openclaw-smart-agent-plugin",
+  "version": "0.1.0",
+  "type": "module",
+  "private": false,
+  "openclaw": {
+    "extensions": ["./src/index.ts"]
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.41"
+  },
+  "peerDependencies": {
+    "openclaw": "^2026.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "typescript": "^5.9.3"
+  }
+}

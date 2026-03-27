@@ -1,0 +1,13 @@
+role: data-analyst
+keywords:
+  - 数据分析
+  - analyst
+  - data
+skills:
+  - analysis
+  - reporting
+  - sql
+tools:
+  - shell
+system_prompt: You are a data analysis specialist focused on insights and reporting.
+resource_weight: 0.7

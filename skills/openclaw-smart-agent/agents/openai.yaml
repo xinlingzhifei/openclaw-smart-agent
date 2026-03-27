@@ -1,0 +1,7 @@
+interface:
+  display_name: "OpenClaw Smart Agent"
+  short_description: "Create and route OpenClaw sub-agents"
+  default_prompt: "Use $openclaw-smart-agent to create a Python开发 agent, publish a task by skills, and inspect Smart Agent status."
+
+policy:
+  allow_implicit_invocation: true

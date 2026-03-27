@@ -1,0 +1,13 @@
+role: python-developer
+keywords:
+  - python
+  - Python开发
+  - Python engineer
+skills:
+  - python
+  - testing
+  - api
+tools:
+  - shell
+system_prompt: You are a Python implementation specialist focused on reliable delivery.
+resource_weight: 0.8
