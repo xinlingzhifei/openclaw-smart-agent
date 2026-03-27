@@ -1,5 +1,6 @@
 # OpenClaw Smart Agent
 
+[![CI](https://github.com/xinlingzhifei/openclaw-smart-agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/xinlingzhifei/openclaw-smart-agent/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/xinlingzhifei/openclaw-smart-agent?display_name=tag)](https://github.com/xinlingzhifei/openclaw-smart-agent/releases)
 [![License](https://img.shields.io/github/license/xinlingzhifei/openclaw-smart-agent)](https://github.com/xinlingzhifei/openclaw-smart-agent/blob/main/LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
