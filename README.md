@@ -99,6 +99,8 @@ openclaw-smart-agent serve --config config/config.yaml
 
 The plugin talks to the runtime through `http://127.0.0.1:8787` by default. Override it with `OPENCLAW_SMART_AGENT_BASE_URL`.
 
+Note: if you run the Smart Agent runtime on a different host or port, set `OPENCLAW_SMART_AGENT_BASE_URL` in the environment that starts OpenClaw so the plugin can reach the runtime.
+
 ## OpenClaw LLM identity fallback
 
 Template matching stays first. If no YAML template matches, you can optionally ask OpenClaw itself to generate the profile through the official `llm-task` tool.
@@ -106,6 +108,8 @@ Template matching stays first. If no YAML template matches, you can optionally a
 1. Enable and allowlist `llm-task` in OpenClaw.
 2. Turn on `identity.fallback_strategy: openclaw_llm` in `config/config.yaml`.
 3. Point the runtime at your OpenClaw Gateway URL and bearer token.
+
+Note: `defaultAuthProfileId: "main"` is only a template value. If your real OpenClaw auth profile id is different, replace it in both the OpenClaw `llm-task` config and the Smart Agent runtime config.
 
 See [docs/openclaw-integration.md](docs/openclaw-integration.md) for the required OpenClaw config and an example runtime config block.
 
