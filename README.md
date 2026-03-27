@@ -14,6 +14,7 @@ OpenClaw Smart Agent is a GitHub-publishable, skill-first bundle for single-mach
 
 See [OpenClaw integration guide](docs/openclaw-integration.md) for the local setup path, verification flow, and plugin installation options.
 See [template guide](docs/template-guide.md) for adding or modifying identity templates.
+See [中文手册：未命中模板且不使用 OpenClaw LLM 的解决方案](docs/template-only-identity-solution.zh-CN.md) for a template-only path when you want deterministic identity matching without model-based fallback.
 
 ## What v1 includes
 
