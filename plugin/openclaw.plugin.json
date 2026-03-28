@@ -6,6 +6,17 @@
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
-    "properties": {}
+    "properties": {
+      "autoStartRuntime": {
+        "type": "boolean",
+        "default": true,
+        "description": "Auto-start the Smart Agent runtime when OpenClaw Gateway loads this plugin."
+      },
+      "runtimeConfigPath": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Optional config file path for the auto-started Smart Agent runtime."
+      }
+    }
   }
 }

@@ -26,12 +26,13 @@ cat <<EOF
 Install complete.
 
 Next steps:
-1. Start the runtime:
-   openclaw-smart-agent serve --config "$ROOT_DIR/config/config.yaml"
-2. Verify the runtime locally with create/status/heartbeat calls:
+1. Install the plugin from "$ROOT_DIR/plugin" using your OpenClaw local extension workflow or publish it to your preferred plugin channel.
+2. Restart OpenClaw Gateway. The plugin will auto-start the runtime by default.
+3. Verify the runtime locally with create/status/heartbeat calls:
    See "$ROOT_DIR/docs/openclaw-integration.md"
-3. Install the plugin from "$ROOT_DIR/plugin" using your OpenClaw local extension workflow or publish it to your preferred plugin channel.
-4. Restart your OpenClaw session so the copied workspace skill is loaded.
+4. Use manual startup only if you want a standalone runtime for debugging:
+   openclaw-smart-agent serve --config "$ROOT_DIR/config/config.yaml"
+5. Restart your OpenClaw session so the copied workspace skill is loaded.
 
 Override the workspace target with:
   OPENCLAW_WORKSPACE=/path/to/workspace ./scripts/install.sh

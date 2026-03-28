@@ -16,13 +16,11 @@ npm --prefix plugin install --no-audit --no-fund
 openclaw-smart-agent init-config --output config/config.yaml
 ```
 
-2. Start the runtime:
+2. Install the plugin in OpenClaw from the local `plugin/` directory or your published package.
 
-```bash
-openclaw-smart-agent serve --config config/config.yaml
-```
+3. Restart OpenClaw Gateway. The plugin will probe `http://127.0.0.1:8787` and auto-start `openclaw-smart-agent serve --config <path>` when the runtime is not already running.
 
-3. Verify the runtime directly before opening OpenClaw:
+4. Verify the runtime directly before opening a Smart Agent workflow:
 
 ```bash
 curl -X POST http://127.0.0.1:8787/api/v1/agents/create \
@@ -48,6 +46,12 @@ Or run the bundled verifier:
 
 ```bash
 python scripts/verify_runtime.py
+```
+
+Manual startup is still supported for local debugging:
+
+```bash
+openclaw-smart-agent serve --config config/config.yaml
 ```
 
 ## OpenClaw tool mapping
@@ -111,6 +115,13 @@ Use `gateway_bearer_token` from your OpenClaw Gateway token or password configur
 
 Use the `plugin/` package as the local extension source according to your OpenClaw installation workflow. This repository keeps the plugin source in one place so it can be packed, linked, or published without changing the runtime.
 
+The plugin exposes two config entries for runtime auto-start:
+
+- `autoStartRuntime`: defaults to `true`
+- `runtimeConfigPath`: optional override for the runtime config file
+
+If `runtimeConfigPath` is not set, the plugin prefers the repository-local `config/config.yaml` and otherwise falls back to its plugin state directory.
+
 ### Published distribution
 
 For broader distribution, publish the `plugin/` package to your preferred OpenClaw plugin channel, then install it from that channel while keeping the Python runtime and workspace skill from this repository.
@@ -121,7 +132,7 @@ Copy or sync `skills/openclaw-smart-agent/` into your OpenClaw workspace skills 
 
 ## Recommended validation sequence
 
-1. Start the runtime
+1. Install the plugin and restart OpenClaw Gateway so the background service can auto-start the runtime
 2. Create an agent
 3. Send a heartbeat
 4. Publish a task

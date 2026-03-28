@@ -34,6 +34,17 @@ def test_plugin_exposes_heartbeat_tool():
     assert "/api/v1/agents/heartbeat" in plugin_text
 
 
+def test_plugin_registers_runtime_autostart_service_and_schema():
+    plugin_entry_text = (ROOT / "plugin" / "src" / "index.ts").read_text(encoding="utf-8")
+    plugin_manifest_text = (ROOT / "plugin" / "openclaw.plugin.json").read_text(encoding="utf-8")
+
+    assert "api.registerService" in plugin_entry_text
+    assert "runtime-autostart" in plugin_entry_text
+    assert "resolveRuntimeAutostartOptions" in plugin_entry_text
+    assert "autoStartRuntime" in plugin_manifest_text
+    assert "runtimeConfigPath" in plugin_manifest_text
+
+
 def test_readme_links_integration_and_heartbeat_flow():
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     integration_guide_path = ROOT / "docs" / "openclaw-integration.md"
@@ -41,6 +52,7 @@ def test_readme_links_integration_and_heartbeat_flow():
     assert integration_guide_path.exists()
     assert "docs/openclaw-integration.md" in readme_text
     assert "smart_agent_heartbeat" in readme_text
+    assert "auto-start the runtime" in readme_text
 
 
 def test_template_guide_is_referenced_by_readme_and_skill():
@@ -61,6 +73,7 @@ def test_runtime_verification_script_is_documented():
     assert verification_script_path.exists()
     assert "verify_runtime.py" in readme_text
     assert "verify_runtime.py" in integration_text
+    assert "auto-start" in integration_text
 
 
 def test_docs_explain_openclaw_llm_identity_fallback():

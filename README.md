@@ -76,31 +76,32 @@ Use this when you also want the workspace skill and plugin package that live in 
 git clone https://github.com/xinlingzhifei/openclaw-smart-agent.git
 cd openclaw-smart-agent
 ./scripts/install.sh
-openclaw-smart-agent serve --config config/config.yaml
 ```
 
 The install script copies the workspace skill into `${OPENCLAW_WORKSPACE:-~/.openclaw/workspace}/skills/openclaw-smart-agent`.
+After you install the plugin and restart OpenClaw Gateway, the plugin will auto-start the runtime by default. Manual `openclaw-smart-agent serve --config config/config.yaml` is still useful for local debugging.
 
 For the full skill-to-plugin-to-runtime verification path, including `smart_agent_heartbeat`, see [docs/openclaw-integration.md](docs/openclaw-integration.md).
 You can also run `python scripts/verify_runtime.py` after starting the runtime to exercise the minimal API flow.
 
 ## OpenClaw integration
 
-1. Start the runtime service:
+1. Publish the plugin package from `plugin/` to npm or ClawHub, or install it from the local `plugin/` directory during development.
 
-```bash
-openclaw-smart-agent serve --config config/config.yaml
-```
+2. Install that plugin in OpenClaw.
 
-2. Publish the plugin package from `plugin/` to npm or ClawHub.
+3. Restart OpenClaw so it picks up the workspace skill from `skills/openclaw-smart-agent/`.
 
-3. Install that published plugin in OpenClaw.
-
-4. Restart OpenClaw so it picks up the workspace skill from `skills/openclaw-smart-agent/`.
+4. The plugin will probe `http://127.0.0.1:8787` and auto-start `openclaw-smart-agent serve` when the runtime is not already running.
 
 The plugin talks to the runtime through `http://127.0.0.1:8787` by default. Override it with `OPENCLAW_SMART_AGENT_BASE_URL`.
 
 Note: if you run the Smart Agent runtime on a different host or port, set `OPENCLAW_SMART_AGENT_BASE_URL` in the environment that starts OpenClaw so the plugin can reach the runtime.
+
+Optional plugin config:
+
+- `autoStartRuntime`: disable this if you want to manage the runtime yourself
+- `runtimeConfigPath`: point the auto-started runtime at a specific config file
 
 ## OpenClaw LLM identity fallback
 

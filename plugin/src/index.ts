@@ -1,10 +1,21 @@
+import { existsSync } from "node:fs";
 import { Type } from "@sinclair/typebox";
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+import {
+  DEFAULT_RUNTIME_BASE_URL,
+  createRuntimeAutostartSupervisor,
+  resolveRuntimeAutostartOptions,
+} from "./runtime-autostart.js";
 
-const runtimeBaseUrl = process.env.OPENCLAW_SMART_AGENT_BASE_URL ?? "http://127.0.0.1:8787";
+const runtimeSupervisor = createRuntimeAutostartSupervisor();
+
+function getRuntimeBaseUrl() {
+  const candidate = process.env.OPENCLAW_SMART_AGENT_BASE_URL?.trim() || DEFAULT_RUNTIME_BASE_URL;
+  return candidate.replace(/\/+$/, "");
+}
 
 async function callRuntime(path: string, init?: RequestInit): Promise<unknown> {
-  const response = await fetch(`${runtimeBaseUrl}${path}`, {
+  const response = await fetch(`${getRuntimeBaseUrl()}${path}`, {
     headers: {
       "content-type": "application/json",
       ...(init?.headers ?? {}),
@@ -36,6 +47,27 @@ export default definePluginEntry({
   name: "OpenClaw Smart Agent",
   description: "Proxy tools for the Smart Agent runtime.",
   register(api) {
+    if (api.registrationMode === "full") {
+      api.registerService({
+        id: "runtime-autostart",
+        async start(ctx) {
+          await runtimeSupervisor.start(
+            resolveRuntimeAutostartOptions({
+              pluginConfig: api.pluginConfig,
+              env: process.env,
+              resolvePath: api.resolvePath,
+              stateDir: ctx.stateDir,
+              pathExists: existsSync,
+            }),
+            ctx.logger,
+          );
+        },
+        async stop(ctx) {
+          await runtimeSupervisor.stop(ctx.logger);
+        },
+      });
+    }
+
     api.registerTool({
       name: "smart_agent_create",
       description: "Create or register a Smart Agent from a short identity description.",
