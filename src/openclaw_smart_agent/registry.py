@@ -35,16 +35,33 @@ class AgentRegistry:
     def list_agents(self) -> list[RegisteredAgent]:
         return self.store.list_agents()
 
-    def eligible_agents(self, required_skills: list[str]) -> list[RegisteredAgent]:
+    def eligible_agents(
+        self,
+        required_skills: list[str],
+        *,
+        allowed_statuses: set[AgentStatus] | None = None,
+    ) -> list[RegisteredAgent]:
         candidates: list[RegisteredAgent] = []
-        required = {skill.casefold() for skill in required_skills}
+        required = self._normalize_skills(required_skills)
+        active_statuses = allowed_statuses or {AgentStatus.HEALTHY, AgentStatus.BUSY}
         for agent in self.store.list_agents():
-            if agent.status not in {AgentStatus.HEALTHY, AgentStatus.BUSY}:
+            if agent.status not in active_statuses:
                 continue
-            agent_skills = {skill.casefold() for skill in agent.skills}
-            if required.issubset(agent_skills):
+            agent_skills = self._normalize_skills(agent.skills)
+            if not required or required & agent_skills:
                 candidates.append(agent)
         return candidates
+
+    def list_dispatchable_tasks(self) -> list[TaskRecord]:
+        dispatchable = [
+            task
+            for task in self.store.list_tasks()
+            if task.status in {TaskStatus.PENDING, TaskStatus.REQUEUED}
+        ]
+        return sorted(
+            dispatchable,
+            key=lambda task: (-task.priority, task.created_at, task.task_id),
+        )
 
     def update_status(self, agent_id: str, status: AgentStatus) -> RegisteredAgent:
         agent = self._require_agent(agent_id)
@@ -146,3 +163,11 @@ class AgentRegistry:
         if not task:
             raise KeyError(f"Unknown task: {task_id}")
         return task
+
+    @staticmethod
+    def _normalize_skills(skills: list[str]) -> set[str]:
+        return {
+            skill.strip().casefold()
+            for skill in skills
+            if isinstance(skill, str) and skill.strip()
+        }

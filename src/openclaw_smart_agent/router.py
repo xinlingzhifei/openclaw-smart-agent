@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from openclaw_smart_agent.models import RegisteredAgent, TaskRecord
+from openclaw_smart_agent.models import AgentStatus, RegisteredAgent, TaskRecord
 from openclaw_smart_agent.registry import AgentRegistry
 
 
@@ -18,25 +18,55 @@ class TaskRouter:
 
     def publish_task(self, task_desc: str, required_skills: list[str], priority: int = 1) -> TaskRecord:
         task = self.registry.create_task(task_desc, required_skills, priority)
-        candidates = self.registry.eligible_agents(required_skills)
-        if not candidates:
-            return task
+        self.dispatch_pending_tasks()
+        return self.registry.get_task(task.task_id) or task
 
-        best_agent = max(candidates, key=lambda agent: self._score(agent, required_skills, priority))
-        return self.registry.assign_task(task.task_id, best_agent.agent_id)
+    def dispatch_pending_tasks(self) -> list[TaskRecord]:
+        dispatched: list[TaskRecord] = []
+        for task in self.registry.list_dispatchable_tasks():
+            candidates = self.registry.eligible_agents(
+                task.required_skills,
+                allowed_statuses=self._allowed_statuses(task.priority),
+            )
+            if not candidates:
+                continue
+
+            best_agent = max(
+                candidates,
+                key=lambda agent: self._score(agent, task.required_skills, task.priority),
+            )
+            dispatched.append(self.registry.assign_task(task.task_id, best_agent.agent_id))
+        return dispatched
 
     def _score(self, agent: RegisteredAgent, required_skills: list[str], priority: int) -> float:
-        required = {skill.casefold() for skill in required_skills} or {""}
-        agent_skills = {skill.casefold() for skill in agent.skills}
-        capability_match = len(required & agent_skills) / len(required)
+        required = self._normalize_skills(required_skills)
+        agent_skills = self._normalize_skills(agent.skills)
+        capability_match = len(required & agent_skills) / len(required) if required else 1.0
         load_penalty = min(
             1.0,
             (agent.running_tasks / 5.0 + agent.cpu_percent / 100.0 + agent.memory_percent / 100.0) / 3.0,
         )
         low_load = 1.0 - load_penalty
-        priority_bias = min(priority / 10.0, 1.0) * agent.resource_weight
+        urgency = min(max(priority, 1) / 10.0, 1.0)
+        capability_weight = min(0.75, self.weights.capability + urgency * 0.2)
+        load_weight = max(0.15, self.weights.load - urgency * 0.1)
+        priority_weight = max(0.05, 1.0 - capability_weight - load_weight)
         return (
-            capability_match * self.weights.capability
-            + low_load * self.weights.load
-            + priority_bias * self.weights.priority
+            capability_match * capability_weight
+            + low_load * load_weight
+            + agent.resource_weight * priority_weight
         )
+
+    @staticmethod
+    def _allowed_statuses(priority: int) -> set[AgentStatus]:
+        if priority >= 8:
+            return {AgentStatus.HEALTHY, AgentStatus.BUSY}
+        return {AgentStatus.HEALTHY}
+
+    @staticmethod
+    def _normalize_skills(skills: list[str]) -> set[str]:
+        return {
+            skill.strip().casefold()
+            for skill in skills
+            if isinstance(skill, str) and skill.strip()
+        }
